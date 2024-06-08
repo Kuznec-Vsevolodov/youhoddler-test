@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  bitcoin-price-service:
+    build: .
+    ports:
+      - "${PORT}:${PORT}"
+    env_file: .env
+    depends_on:
+      - db
+    links:
+      - db
+
+volumes:
+  postgres_data:
