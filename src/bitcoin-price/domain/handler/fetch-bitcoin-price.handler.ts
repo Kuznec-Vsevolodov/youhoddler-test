@@ -3,9 +3,9 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { FetchBitcoinPriceCommand } from '../command/fetch-bitcoin-price.command';
-import { SaveBitcoinPriceCommand } from '../command/save-bitcoin-price.command';
 import { BitcoinPriceDto } from '../../application/dto/bitcoin-price.dto';
 import { BitcoinPriceFetchedEvent } from '../event/bitcoin-price-fetched.event';
+import BigNumber from 'bignumber.js';
 
 @CommandHandler(FetchBitcoinPriceCommand)
 export class FetchBitcoinPriceHandler implements ICommandHandler<FetchBitcoinPriceCommand> {
@@ -33,9 +33,9 @@ export class FetchBitcoinPriceHandler implements ICommandHandler<FetchBitcoinPri
       const midPrice = (bidPriceWithCommission + askPriceWithCommission) / 2;
 
       const bitcoinPriceDto: BitcoinPriceDto = {
-        bidPrice: bidPriceWithCommission,
-        askPrice: askPriceWithCommission,
-        midPrice,
+        bidPrice: new BigNumber(bidPriceWithCommission.toString()),
+        askPrice: new BigNumber(askPriceWithCommission.toString()),
+        midPrice: new BigNumber(midPrice.toString()),
       };
 
       await this.eventBus.publish(new BitcoinPriceFetchedEvent(bitcoinPriceDto));

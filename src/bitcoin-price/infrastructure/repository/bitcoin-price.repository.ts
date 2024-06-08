@@ -3,6 +3,8 @@ import { BitcoinPrice } from "../entities/bitcoin-price.entity";
 import { Repository } from "typeorm";
 import { BitcoinPriceDto } from "src/bitcoin-price/application/dto/bitcoin-price.dto";
 import { InjectRepository } from "@nestjs/typeorm";
+import { plainToClass } from 'class-transformer';
+import BigNumber from "bignumber.js";
 
 @Injectable()
 export class BitcoinPriceRepository
@@ -12,26 +14,28 @@ export class BitcoinPriceRepository
       ) {}
 
     async getNewestBitcoinPrice(): Promise<BitcoinPriceDto> {
-        const bitcoinPrice: BitcoinPrice = await this.bitcoinPriceRepository.findOne({
-            where: {},
-            order: { createdAt: 'DESC' }
-          });
-    
-        const bitcoinPriceDto: BitcoinPriceDto = new BitcoinPriceDto();
-    
-        bitcoinPriceDto.askPrice = bitcoinPrice.askPrice;
-        bitcoinPriceDto.bidPrice = bitcoinPrice.bidPrice;
-        bitcoinPriceDto.midPrice = bitcoinPrice.midPrice;
+        const bitcoinPrice: BitcoinPrice = await this.bitcoinPriceRepository.find({
+          order: { createdAt: 'DESC' },
+          take: 1,
+        }).then(results => results[0]);
+
+        const bitcoinPriceDto: BitcoinPriceDto = {
+          bidPrice: new BigNumber(bitcoinPrice.bidPrice),
+          askPrice: new BigNumber(bitcoinPrice.askPrice),
+          midPrice: new BigNumber(bitcoinPrice.midPrice),
+        };
 
         return bitcoinPriceDto;
     }
 
     async saveBitcoinPrice(bitcoinPriceDto: BitcoinPriceDto): Promise<void> {
-        const bitcoinPriceEntity = new BitcoinPrice();
+        const { askPrice, bidPrice, midPrice } = bitcoinPriceDto;
 
-        bitcoinPriceEntity.askPrice = bitcoinPriceDto.askPrice;
-        bitcoinPriceEntity.bidPrice = bitcoinPriceDto.bidPrice;
-        bitcoinPriceEntity.midPrice = bitcoinPriceDto.midPrice;
+        const bitcoinPriceEntity: BitcoinPrice = new BitcoinPrice(
+          bidPrice.toNumber(), 
+          askPrice.toNumber(), 
+          midPrice.toNumber()
+        );
 
         await this.bitcoinPriceRepository.save(bitcoinPriceEntity);
     }
