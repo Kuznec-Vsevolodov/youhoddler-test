@@ -1,11 +1,11 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { FetchBitcoinPriceCommand } from '../command/fetch-bitcoin-price.command';
 import { SaveBitcoinPriceCommand } from '../command/save-bitcoin-price.command';
-import { CommandBus } from '@nestjs/cqrs';
 import { BitcoinPriceDto } from '../../application/dto/bitcoin-price.dto';
+import { BitcoinPriceFetchedEvent } from '../event/bitcoin-price-fetched.event';
 
 @CommandHandler(FetchBitcoinPriceCommand)
 export class FetchBitcoinPriceHandler implements ICommandHandler<FetchBitcoinPriceCommand> {
@@ -15,7 +15,7 @@ export class FetchBitcoinPriceHandler implements ICommandHandler<FetchBitcoinPri
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly commandBus: CommandBus,
+    private readonly eventBus: EventBus,
   ) {
     this.serviceCommission = this.configService.get<number>('serviceCommission');
     this.binanceApiUrl = this.configService.get<string>('binancePriceApiUrl');
@@ -38,7 +38,7 @@ export class FetchBitcoinPriceHandler implements ICommandHandler<FetchBitcoinPri
         midPrice,
       };
 
-      await this.commandBus.execute(new SaveBitcoinPriceCommand(bitcoinPriceDto));
+      await this.eventBus.publish(new BitcoinPriceFetchedEvent(bitcoinPriceDto));
     } catch (error) {
       console.error('Error fetching Bitcoin price', error);
       throw error;
