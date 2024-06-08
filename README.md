@@ -1,5 +1,7 @@
 ## Installation
 
+Copy .env.dist to .env
+
 ```bash
 $ make build
 ```
@@ -7,7 +9,6 @@ $ make build
 ## Running the app
 
 ```bash
-# development
 $ make up
 ```
 
