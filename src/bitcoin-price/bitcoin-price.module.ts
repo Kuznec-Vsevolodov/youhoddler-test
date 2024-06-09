@@ -13,6 +13,7 @@ import BitcoinPriceConfig from '../config/binance-api-config';
 import { BitcoinPriceUpdateingStartedEvent } from './domain/event/bitcoin-price-updating-started.event';
 import { BitcoinPriceService } from './domain/services/bitcoin-price.service';
 import { BitcoinPriceRepository } from './infrastructure/repository/bitcoin-price.repository';
+import { BinanceApiPriceFetcher } from './infrastructure/api-fetcher/binance-api-price.fetcher';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { BitcoinPriceRepository } from './infrastructure/repository/bitcoin-pric
     SaveBitcoinPriceHandler,
     BitcoinPriceSaga,
     BitcoinPriceService,
-    BitcoinPriceRepository
+    BitcoinPriceRepository,
+    BinanceApiPriceFetcher,
   ],
   controllers: [BitcoinPriceController],
 })
