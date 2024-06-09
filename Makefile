@@ -31,11 +31,6 @@ build:
 logs:
 	docker-compose -f $(DOCKER_COMPOSE_FILE) logs -f
 
-# Запуск тестов
-.PHONY: test
-test:
-	docker-compose -f $(DOCKER_COMPOSE_FILE) run --rm $(CONTAINER_NAME) npm run test
-
 # Подключение к контейнеру для выполнения команд
 .PHONY: exec
 exec:

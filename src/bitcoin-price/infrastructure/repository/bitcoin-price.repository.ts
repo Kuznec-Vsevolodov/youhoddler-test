@@ -3,7 +3,6 @@ import { BitcoinPrice } from "../entities/bitcoin-price.entity";
 import { Repository } from "typeorm";
 import { BitcoinPriceDto } from "src/bitcoin-price/application/dto/bitcoin-price.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { plainToClass } from 'class-transformer';
 import BigNumber from "bignumber.js";
 
 @Injectable()
@@ -32,9 +31,9 @@ export class BitcoinPriceRepository
         const { askPrice, bidPrice, midPrice } = bitcoinPriceDto;
 
         const bitcoinPriceEntity: BitcoinPrice = new BitcoinPrice(
-          bidPrice.toNumber(), 
-          askPrice.toNumber(), 
-          midPrice.toNumber()
+          bidPrice.toString(), 
+          askPrice.toString(), 
+          midPrice.toString()
         );
 
         await this.bitcoinPriceRepository.save(bitcoinPriceEntity);

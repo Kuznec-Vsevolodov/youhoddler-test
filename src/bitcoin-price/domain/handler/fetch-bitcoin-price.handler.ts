@@ -9,6 +9,7 @@ import BigNumber from 'bignumber.js';
 
 @CommandHandler(FetchBitcoinPriceCommand)
 export class FetchBitcoinPriceHandler implements ICommandHandler<FetchBitcoinPriceCommand> {
+
   private readonly serviceCommission: number;
   private readonly binanceApiUrl: string;
 
@@ -28,14 +29,20 @@ export class FetchBitcoinPriceHandler implements ICommandHandler<FetchBitcoinPri
       
       const { bidPrice, askPrice } = response.data;
 
-      const bidPriceWithCommission = bidPrice * (1 + this.serviceCommission / 100);
-      const askPriceWithCommission = askPrice * (1 + this.serviceCommission / 100);
-      const midPrice = (bidPriceWithCommission + askPriceWithCommission) / 2;
+      const bidPriceWithCommission: BigNumber = new BigNumber(bidPrice)
+        .mul(1 + this.serviceCommission / 100);
+
+      const askPriceWithCommission: BigNumber = new BigNumber(askPrice)
+        .mul(1 + this.serviceCommission / 100);
+
+      const midPrice: BigNumber = bidPriceWithCommission
+        .plus(askPriceWithCommission)
+        .dividedBy(2);
 
       const bitcoinPriceDto: BitcoinPriceDto = {
-        bidPrice: new BigNumber(bidPriceWithCommission.toString()),
-        askPrice: new BigNumber(askPriceWithCommission.toString()),
-        midPrice: new BigNumber(midPrice.toString()),
+        bidPrice: bidPriceWithCommission,
+        askPrice: askPriceWithCommission,
+        midPrice: midPrice,
       };
 
       await this.eventBus.publish(new BitcoinPriceFetchedEvent(bitcoinPriceDto));

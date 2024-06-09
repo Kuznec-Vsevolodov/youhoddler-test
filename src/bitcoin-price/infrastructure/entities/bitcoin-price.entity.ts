@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 
 @Entity()
 export class BitcoinPrice {
-  constructor(bidPrice: number, askPrice: number, midPrice: number) {
+  constructor(bidPrice: string, askPrice: string, midPrice: string) {
     this.bidPrice = bidPrice;
     this.askPrice = askPrice;
     this.midPrice = midPrice;
@@ -13,17 +13,17 @@ export class BitcoinPrice {
   id: number;
 
   @Column('decimal')
-  bidPrice: number;
+  bidPrice: string;
 
   @Column('decimal')
-  askPrice: number;
+  askPrice: string;
 
   @Column('decimal')
-  midPrice: number
+  midPrice: string
 
   @CreateDateColumn({ name: "created_at" })
-  createdAt?: Date
+  createdAt: Date
 
   @UpdateDateColumn({ name: "updated_at" })
-  updatedAt?: Date
+  updatedAt: Date
 }
